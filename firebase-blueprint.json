@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "Wedding": {
+      "title": "Wedding Configuration",
+      "description": "Global settings for the wedding invitation website",
+      "type": "object",
+      "properties": {
+        "coupleNames": { "type": "string" },
+        "story": { "type": "string" },
+        "themeColor": { "type": "string" },
+        "heroImage": { "type": "string" },
+        "musicEnabled": { "type": "boolean" },
+        "contactPhone": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["coupleNames", "themeColor"]
+    },
+    "Event": {
+      "title": "Wedding Event",
+      "description": "An event like Haldi, Mehendi, or Wedding ceremony",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "location": { "type": "string" },
+        "description": { "type": "string" },
+        "mapUrl": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "date", "time", "location"]
+    },
+    "Guest": {
+      "title": "Wedding Guest",
+      "description": "Guest details and RSVP status",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "rsvpStatus": { "type": "string", "enum": ["pending", "attending", "declined"] },
+        "guestCount": { "type": "integer" },
+        "notes": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Image",
+      "description": "Images for the wedding photo gallery",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "caption": { "type": "string" },
+        "category": { "type": "string" },
+        "order": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "/weddings/{weddingId}": { "schema": "Wedding", "description": "Global wedding settings" },
+    "/weddings/{weddingId}/events/{eventId}": { "schema": "Event", "description": "Wedding ceremonies and parties" },
+    "/weddings/{weddingId}/guests/{guestId}": { "schema": "Guest", "description": "Guest RSVP records" },
+    "/weddings/{weddingId}/gallery/{imageId}": { "schema": "GalleryItem", "description": "Wedding photo collection" }
+  }
+}

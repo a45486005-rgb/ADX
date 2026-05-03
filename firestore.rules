@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitives
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { 
+      return isSignedIn() && request.auth.token.email == 'a45486005@gmail.com' && request.auth.token.email_verified == true;
+    }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // 1. Weddings (Public Read)
+    match /weddings/{weddingId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(weddingId);
+
+      // 2. Events (Public Read)
+      match /events/{eventId} {
+        allow read: if true;
+        allow write: if isAdmin() && isValidId(eventId);
+      }
+
+      // 3. Guests (Admin Read, Public Create/Update for RSVP)
+      match /guests/{guestId} {
+        allow read: if isAdmin();
+        
+        // Validation helper for Guest
+        function isValidGuest(data) {
+          return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+            && (data.rsvpStatus in ['pending', 'attending', 'declined'])
+            && (!('guestCount' in data) || data.guestCount is int)
+            && (!('email' in data) || data.email is string)
+            && (!('phone' in data) || data.phone is string);
+        }
+
+        allow create: if isValidGuest(incoming()) 
+          && (!('updatedAt' in incoming()) || incoming().updatedAt == request.time);
+        
+        allow update: if isAdmin() || (
+          incoming().diff(existing()).affectedKeys().hasOnly(['rsvpStatus', 'guestCount', 'notes', 'updatedAt'])
+          && isValidGuest(incoming())
+        );
+        
+        allow delete: if isAdmin();
+      }
+
+      // 4. Gallery (Public Read)
+      match /gallery/{imageId} {
+        allow read: if true;
+        allow write: if isAdmin() && isValidId(imageId);
+      }
+    }
+  }
+}
