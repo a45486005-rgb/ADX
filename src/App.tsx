@@ -65,7 +65,17 @@ export default function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<div className="h-screen flex items-center justify-center font-serif text-stone-400">Please provide a valid invitation link.</div>} />
+          <Route path="*" element={
+            <div className="h-screen flex flex-col items-center justify-center bg-stone-50 font-serif p-4 text-center">
+              <h1 className="text-4xl font-display mb-4">ADX WISH</h1>
+              <p className="text-stone-500 italic max-w-md">
+                Please provide a valid invitation link to view your wedding card.
+              </p>
+              <div className="mt-8 text-[10px] uppercase tracking-[0.3em] text-stone-300 font-bold">
+                © ADX WISH DIGITAL INVITATIONS
+              </div>
+            </div>
+          } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
